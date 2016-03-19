@@ -1,0 +1,2 @@
+Batter,OnDeck,Stat,BatterBA,OnDeckBA
+tried
