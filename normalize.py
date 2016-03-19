@@ -40,8 +40,12 @@ def translateOutcome(eventColumn):               #translate entire play into the
             outcome.append("baserunning")
         elif "S" in result:
             outcome.append("Single")
-        elif "HP" in result or "SH" in result or "FLE" in result:
+        elif "HP" in result:
+            outcome.append("HBP")
+        elif "FLE" in result:
             outcome.append("NULL")
+        elif "SH" in result:
+            outcome.append("SH")
         elif "IW" in result:
             outcome.append("IBB")
         elif "W" in result:

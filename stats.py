@@ -13,7 +13,7 @@ outcome = toList(df.Event, "Outcome")     # Entire play is encoded.
 batter = toList(df.Batter, "Batter")      # Batter
 onDeck=toList(df.OnDeck, "OnDeck")        # On Deck
 
-lahmanDF = pd.read_csv("2010BALahman.csv")      # Database #2
+lahmanDF = pd.read_csv("2010OPSLahman.csv")      # Database #2
 playerID = toList(lahmanDF.playerID, "playerID")
 BA = toList(lahmanDF.BA, "BA")
 
@@ -44,6 +44,14 @@ def baSolver(H,AB):
         return -1
     else:
         return H/AB
+
+def OPS(H,AB,BB,SH,TB, HBP):
+    if AB==0:
+        return -1
+    else:
+        SLG = TB/AB
+        OBP = (H+BB+HBP)/(AB+BB+SH+HBP)
+        return SLG+OBP
 def statSolver():
     database = atbat()
     answer = []
@@ -53,28 +61,40 @@ def statSolver():
             answer[uniqueBatter].append([database[uniqueBatter][uniqueOnDeck][0]])
             H=0.
             AB = 0.
+            BB = 0.
+            SH =0.
+            TB = 0.
+            HBP = 0.
             for outcomes in database[uniqueBatter][uniqueOnDeck]:
                 if outcomes == "HR":
                     H=H+1
                     AB = AB + 1
+                    TB = TB + 4
                 elif outcomes == "Triple":
                     H=H+1
                     AB = AB + 1
+                    TB = TB + 3
                 elif outcomes == "Double":
                     AB = AB + 1
                     H=H+1
+                    TB = TB + 2
                 elif outcomes == "Single":
                     AB = AB + 1
                     H=H+1
+                    TB = TB + 1
+                elif outcomes == "HBP":
+                    HBP = HBP + 1
+                elif outcomes == "BB" or outcomes == "IBB":
+                    BB = BB + 1
                 # elif outcomes == "BB" or outcomes =="IBB":
                     # BB = BB + 1
                 elif outcomes == "out":
                     AB = AB + 1
-            if AB > 100:
+            if AB > 25:
                 #for RC
                 # answer[uniqueBatter][uniqueOnDeck].append(wRCSolver(H,BB,TB,AB))
                 # for BA
-                answer[uniqueBatter][uniqueOnDeck].append(baSolver(H,AB))
+                answer[uniqueBatter][uniqueOnDeck].append(OPS(H,AB,BB,SH,TB, HBP))
             else:
                 answer[uniqueBatter][uniqueOnDeck].append(-1)
     return answer
@@ -99,8 +119,8 @@ def normalizeName(name):
 
 def formatter(l):
     answer=[]
-    f=open("ba2010.txt","wb")
-    f.write("Batter,OnDeck,Stat,BatterBA,OnDeckBA\n")
+    f=open("OPS2010.txt","wb")
+    f.write("Batter,OnDeck,Stat,BatterOPS,OnDeckOPS\n")
     for batter in range(0, len(l)):
         i = 1
         while (i < len(playerID) and normalizeName(playerID[i]) != normalizeName(l[batter][0])):
